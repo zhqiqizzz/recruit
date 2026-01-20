@@ -14,9 +14,9 @@ export default defineConfig({
     }),
   ],
   server: {
-    proxy: {
-      "/api": "https://api.imooc.zcwytd.com",
-    },
+    // proxy: {
+    //   "/api": "https://api.imooc.zcwytd.com",
+    // },
     cors: true,
   },
   resolve: {

@@ -1,6 +1,5 @@
 import axios from "axios";
-import { Toast } from "vant";
-
+import { Notify } from "vant";
 const request = axios.create({
   baseURL: "/api",
   timeout: 10000,
@@ -11,8 +10,7 @@ request.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
-      //   config.headers.Authorization = `Bearer ${token}`;
-      config.params = { token: token };
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -24,13 +22,15 @@ request.interceptors.response.use(
   (response) => {
     const res = response.data;
     if (res.code !== 200) {
-      return Promise.reject(new Error(res.success || "Error"));
-    } else {
-      if (res.code === 200) {
-        return res.result;
-      } else {
-        Toast(res.success);
+      const errorMsg = res.message || res.success || "请求异常";
+      Notify({ type: "danger", message: errorMsg });
+      if (res.code === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       }
+      return Promise.reject(new Error(errorMsg));
+    } else {
+      return res.result;
     }
   },
   (error) => Promise.reject(error)
