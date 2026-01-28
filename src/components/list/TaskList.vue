@@ -1,129 +1,181 @@
 <script setup lang="ts">
-    import type { Task } from '@/types/task';
-    import {useRouter} from 'vue-router'
-    const props = withDefaults(defineProps<{
-        taskList: Task[]
-    }>(),{
-        taskList: () => []
-    })
-    const router = useRouter()
-    const gotoDetail = (id: any) =>{
-        router.push(`/task/details/${id}`)
-    }
+import type { taskItem } from '@/types/task';
+import {useRouter} from 'vue-router'
+const props = withDefaults(defineProps<{
+    taskList: taskItem[]
+}>(), {
+    taskList: () => [],
+    showCompany: true
+});
+const router = useRouter()
+const gotoDetail = (id: any) =>{
+    router.push(`/task/details/${id}`)
+}
 </script>
 <template>
-    <div class="task-item" v-for="(item, index) in props.taskList" :key="index" @click="gotoDetail(item.id)">
-        <div class="task-item-top">
-            <!-- <h3>{{item.task_name}}</h3> -->
-            <!-- <span v-if="item.is_emergency == 1">紧急</span> -->
-            <h3>移动端小程序开发</h3>
-            <span>紧急</span>
+    <div class="job-card" v-for="(item, index) in props.taskList" :key="index" @click="gotoDetail(item.task_id)">
+        <div class="card-head">
+            <div class="head-left">
+                <h3 class="job-title">{{ item.position_name }}</h3>
+                <span v-if="item.is_emergency === 1" class="tag-urgent">急</span>
+            </div>
+            <span class="salary-text">¥{{ item.salary }} / 月</span>
         </div>
-        <dl>
-            <dt>
-                <h5>任务预算</h5>
-                <!-- <strong>￥{{item.task_budget}}</strong> -->
-                <strong>￥5000</strong>
-            </dt>
-            <dt>
-                <h5>任务周期</h5>
-                <!-- <strong>{{item.task_cycle}}天</strong> -->
-                <strong>30天</strong>
-            </dt>
-            <dt>
-                <h5>服务方式</h5>
-                <!-- <strong>{{item.service_mode}}</strong> -->
-                <strong>线上</strong>
-            </dt>
-        </dl>
-        <!-- <p>任务要求：{{item.task_ask}}</p> -->
-        <p>任务要求：熟悉微信小程序开发，能够独立完成小程序的设计与开发工作，具备良好的沟通能力和团队合作精神。</p>
-        <div class="task-item-bottom">
-            <!-- <label>{{item.company_name}}</label> -->
-            <label>深圳市腾讯计算机系统有限公司</label>
-            <!-- <span><van-icon name="location-o" />{{item.city}}</span> -->
-            <span><van-icon name="location-o" />深圳</span>
+
+        <div class="card-tags">
+            <span class="tag-item">{{ item.city }}{{ item.area ? `·${item.area}` : '' }}</span>
+            <span class="tag-item">{{ item.task_cycle }}天周期</span>
+            <span class="tag-item">{{ item.service_mode }}</span>
+            <span v-if="item.task_grade" class="tag-item tag-grade">{{ item.task_grade }}</span>
+        </div>
+
+        <p class="task-ask" v-if="item.task_ask">{{ item.task_ask }}</p>
+
+        <div class="card-foot">
+            <div class="company-wrap">
+                <img v-if="item.logo" :src="item.logo" class="company-logo" />
+                <div v-else class="company-logo-text">
+                    {{ item.company_name ? item.company_name.charAt(0) : '企' }}
+                </div>
+                
+                <span class="company-name">{{ item.company_name }}</span>
+            </div>
         </div>
     </div>
 </template>
+
 <style scoped>
-.task-item{
+.job-card {
     background: #FFFFFF;
-    border-radius: 0.53rem;
-    margin:0 0 0.53rem;
-    padding: 0.88rem 0.48rem 0.75rem;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 10px;
     position: relative;
-    font-size: 0.69rem;
-    font-weight: 100;
-    color: #666666;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); 
+    border: none; 
 }
-.task-item-top{
+
+.job-card:active {
+    background-color: #F9F9F9;
+}
+
+.card-head {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    line-height: 1.4;
 }
-.task-item-top h3{
-    font-size: 0.91rem;
-    line-height: 0.91rem;
-    font-weight: 400;
-    color: #333333;
-    margin-bottom: 1.01rem;
-}
-.task-item-top span{
-    position: absolute;
-    right: 0;
-    width: 2.29rem;
-    height: 1.08rem;
-    line-height: 1.08rem;
-    background: linear-gradient(90deg, #FEA829, #FE8F27);
-    border-radius: 0.53rem 0 0 0.53rem;
-    text-align: center;
-    font-size: 0.59rem;
-    color: #FFFFFF;
-}
-dl{
+
+.head-left {
     display: flex;
-    margin-bottom: 0.8rem;
+    align-items: center;
+    flex: 1;
+    margin-right: 12px;
 }
-dl dt{
-    margin-right: 1.44rem;
-}
-dl dt h5{
-    font-size: 0.69rem;
-    line-height: 0.69rem;
-    margin-bottom: 0.53rem;
-    font-weight: 100;
-    color: #999999;
-}
-dl dt strong{
-    font-size: 0.64rem;
-    line-height: 0.64rem;
-    display: block;
-    font-weight: 500;
-    color: #333333;
-}
-.task-item p{
-    color: #333333;
+
+.job-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #222;
+    margin-right: 6px;
     overflow: hidden;
     text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    white-space: nowrap;
+    max-width: 100%;
 }
-.task-item-bottom{
-    display: flex;
-    border-top: 1px solid #f5f5f5;
-    margin-top: 0.72rem;
-    padding-top: 0.72rem;
-    line-height: 0.69rem;
+
+.tag-urgent {
+    font-size: 12px;
+    color: #FF4D4F;
+    border: 1px solid rgba(255, 77, 79, 0.5);
+    border-radius: 2px;
+    padding: 0 2px;
+    height: 14px;
+    line-height: 13px;
+    flex-shrink: 0;
 }
-.task-item-bottom label{
-    flex: 1;
-}
-.task-item-bottom span{
-    text-align: right;
-}
-.task-item-bottom i{
-    font-size: 0.8rem;
+
+.salary-text {
+    font-size: 15px;
+    color: #FF8800;
     font-weight: 600;
-    margin-right: 0.1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+    flex-shrink: 0;
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.tag-item {
+    background: #F7F8FA;
+    color: #666;
+    font-size: 12px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    line-height: 1.4;
+}
+
+.tag-grade {
+    background: #F0F9FF;
+    color: #007AFF;
+}
+
+.task-ask {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.company-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.company-logo {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-right: 6px;
+    object-fit: cover;
+}
+
+.company-logo-text {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-right: 6px;
+    background: #E0E0E0;
+    color: #FFF;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.company-name {
+    font-size: 12px;
+    color: #888;
+    font-weight: 400;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>

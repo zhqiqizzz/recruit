@@ -33,3 +33,10 @@ export function getPolicy(data: any) {
     params: data,
   }) as Promise<PolicyRes>;
 }
+
+export function getUserDetailApi(userId: any) {
+  return request({
+    url: `/user/detail/${userId}`,
+    method: "get",
+  });
+}

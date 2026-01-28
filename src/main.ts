@@ -5,6 +5,7 @@ import pinia from "@/store";
 import "@/utils/rem.ts";
 import router from "@/router";
 import "vant/lib/index.css";
+import "vant/es/toast/style";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
 async function enableMocking() {

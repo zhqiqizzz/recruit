@@ -1,13 +1,7 @@
-import { http, HttpResponse, delay } from "msw";
+import { http, delay } from "msw";
 import { db } from "@/mocks/db";
 import { fakerZH_CN as faker } from "@faker-js/faker";
-
-// 通用响应封装
-const success = (data: any) =>
-  HttpResponse.json({ code: 200, success: "ok", result: data });
-
-const error = (msg: string) =>
-  HttpResponse.json({ code: 500, success: "fail", message: msg });
+import { success, error } from "@/mocks/utils";
 
 export const userHandlers = [
   http.post("/api/login/code", async ({ request }) => {
@@ -40,8 +34,6 @@ export const userHandlers = [
         id: faker.number.int({ min: 100000, max: 999999 }),
         accounts: phoneStr,
         latest_code: mockCode,
-
-        // --- 基础信息 ---
         user_name: faker.person.fullName(),
         sex: faker.helpers.arrayElement([0, 1]),
         birthday: faker.date.birthdate().toISOString().split("T")[0],
@@ -107,18 +99,25 @@ export const userHandlers = [
         where: { id: { equals: Number(id) } },
       });
       if (item) {
-        return HttpResponse.json({
-          code: 200,
-          success: "ok",
-          result: item,
-        });
+        return success(item);
       } else {
-        return HttpResponse.json({
-          code: 500,
-          success: "fail",
-          message: "未找到该协议",
-        });
+        return error("未找到该协议");
       }
     }
+    return error("参数错误");
+  }),
+
+  http.get("/api/user/detail/:userId", async ({ params }) => {
+    await delay(300);
+    const { userId } = params;
+
+    const user = db.user.findFirst({
+      where: {
+        id: {
+          equals: Number(userId),
+        },
+      },
+    });
+    return success(user);
   }),
 ];

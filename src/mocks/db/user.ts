@@ -16,6 +16,8 @@ export const userModel = {
   email: nullable(String),
   work_time: String,
   head_img: String,
+  logo: nullable(String),
+  company_name: nullable(String),
   idcard: nullable(String),
   account_price: nullable(Number),
   is_checked: Number,
@@ -36,7 +38,7 @@ export const agreementModel = {
   type: Number,
 };
 
-export const seedDB = (db: any) => {
+export const userDB = (db: any) => {
   db.agreement.create({
     id: 1,
     title: "《用户服务协议》",
@@ -118,7 +120,7 @@ export const seedDB = (db: any) => {
     id: 10002,
     accounts: "13800000002",
     latest_code: "",
-    user_name: "测试企业001",
+    user_name: "黄晓明",
     role: "3",
     sex: 1,
     birthday: "1990-01-01",
@@ -132,5 +134,7 @@ export const seedDB = (db: any) => {
     enterprise: 1,
     it_enterprise: 1,
     manage: 0,
+    logo: faker.image.url({ width: 128, height: 128 }),
+    company_name: faker.company.name(),
   });
 };

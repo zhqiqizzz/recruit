@@ -23,6 +23,28 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/views/Task/index.vue"),
   },
   {
+    path: "/task/city/list",
+    component: () => import("@/views/Task/Components/CitySwitch.vue"),
+    meta: {
+      title: "城市切换",
+    },
+  },
+  {
+    path: "/task/position/type",
+    component: () => import("@/views/Task/Components/PositionType.vue"),
+    meta: {
+      title: "职位筛选",
+    },
+  },
+  {
+    path: "/task/taskList",
+    component: () => import("@/components/list/TaskList.vue"),
+  },
+  {
+    path: "/task/screen",
+    component: () => import("@/views/Task/Components/Screen.vue"),
+  },
+  {
     path: "/task/search",
     component: () => import("@/views/Task/search.vue"),
   },
