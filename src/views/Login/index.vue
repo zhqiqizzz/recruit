@@ -46,12 +46,12 @@ const toLogin = async () => {
         accounts: state.value.accounts,
         code: state.value.code
     })
-    if(userStore.role === '1'){
+    if(localStorage.getItem("role") === '1'){
       console.log('跳转任务页')
         router.push('/task')
-    } else if(userStore.role === '2'){
+    } else if(localStorage.getItem("role") === '2'){
         router.push('/admin/home')
-    } else if(userStore.role === '3'){
+    } else if(localStorage.getItem("role") === '3'){
         router.push('/talent')
     } else {
         Notify({ type: 'warning', message: '用户角色异常，请联系管理员' });

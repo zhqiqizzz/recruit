@@ -2,8 +2,8 @@
 import { onMounted, ref } from 'vue';
 import { usePositionStore } from '@/store/task';
 import { getPositionTypeApi } from '@/api/task';
-import { useRouter } from 'vue-router';
-const router = useRouter();
+// 通知父组件关闭弹窗
+const emit = defineEmits(['close']);
 const positionStore = usePositionStore();
 const positionList = ref<any>([])
 const activeIndex = ref(0);
@@ -13,7 +13,7 @@ const getPositionType = async () => {
     initActiveSidebar();
 }
 const leftBack = () => {
-    router.back();
+    emit('close');
 }
 // 初始化侧边栏选中项：即已选中的职位类型所属的大类
 const initActiveSidebar = () => {
@@ -34,7 +34,7 @@ const handleItemClick = (item: any) => {
     } else {
         positionStore.setPositionType(item.name);
     }
-    router.back();
+    emit('close');
 }
 onMounted(() => {
     getPositionType();

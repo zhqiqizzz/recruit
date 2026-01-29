@@ -12,6 +12,7 @@ export const useUserStore = defineStore(
       if (res.data) {
         userInfo.value = res.data.user_info;
         localStorage.setItem("token", res.data.token);
+        localStorage.setItem("role", res.data.user_info.role);
         role.value =
           res.data.user_info && res.data.user_info.role
             ? res.data.user_info.role
@@ -23,10 +24,10 @@ export const useUserStore = defineStore(
       token.value = null;
       role.value = "";
       localStorage.removeItem("token");
+      localStorage.removeItem("role");
     };
     return {
       userInfo,
-      role,
       loginUser,
       clearUserInfo,
     };

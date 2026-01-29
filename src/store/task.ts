@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-
+import { useUserStore } from "@/store/user";
+const userStore = useUserStore();
 export const useCityStore = defineStore("city", () => {
   const cityValue = ref("北京市");
   const setCity = (name: string) => {
@@ -48,3 +49,29 @@ export const useScreenStore = defineStore("screen", () => {
     setSalary,
   };
 });
+
+export const useSearchStore = defineStore("search", () => {
+  const HISTORY_KEY = `search_history_${userStore.userInfo.id}`;
+  const historyList = ref(JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'));
+
+  const addHistory = (term: string) => {
+    if (!term.trim()) return;
+    historyList.value = historyList.value.filter((item: any) => item !== term);
+    historyList.value.unshift(term);
+    if(historyList.value.length > 10) {
+      historyList.value = historyList.value.slice(0, 10);
+    }
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(historyList.value));
+  }
+
+  const clearHistory = () => {
+    historyList.value = [];
+    localStorage.removeItem(HISTORY_KEY);
+  }
+  
+  return {
+    historyList,
+    addHistory,
+    clearHistory,
+  }
+})

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import { getTaskScreenApi, type ScreenDictItem } from '@/api/task';
 import { useScreenStore } from '@/store/task';
@@ -10,9 +9,9 @@ const salaryList = ref<ScreenDictItem[]>([]);
 const modeValue = ref(screenStore.serviceMode);
 const cycleValue = ref(screenStore.taskCycle);
 const salaryValue = ref(screenStore.salary);
-const router = useRouter();
+const emit = defineEmits(['close', 'confirm']);
 const onClickLeft = () => {
-    router.back();
+    emit('close');
 }
 const getScreenData = async () => {
     const res = await getTaskScreenApi();
@@ -46,15 +45,12 @@ const handleClear = () => {
     modeValue.value = '';
     cycleValue.value = '';
     salaryValue.value = '';
-    screenStore.setServiceMode('');
-    screenStore.setTaskCycle('');
-    screenStore.setSalary('');
 }
 const handleConfirm = () => {
     screenStore.setServiceMode(modeValue.value);
     screenStore.setTaskCycle(cycleValue.value);
     screenStore.setSalary(salaryValue.value);
-    router.back();
+    emit('confirm');
 }
 onMounted(() => {
     getScreenData();

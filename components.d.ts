@@ -11,11 +11,14 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    CitySwitch: typeof import('./src/components/CitySwitch.vue')['default']
     ContractList: typeof import('./src/components/list/ContractList.vue')['default']
     FooterTabbar: typeof import('./src/components/FooterTabbar.vue')['default']
     MessageList: typeof import('./src/components/list/MessageList.vue')['default']
+    PositionType: typeof import('./src/components/PositionType.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Screen: typeof import('./src/components/Screen.vue')['default']
     TalentList: typeof import('./src/components/list/TalentList.vue')['default']
     TaskList: typeof import('./src/components/list/TaskList.vue')['default']
     VanBadge: typeof import('vant/es')['Badge']
@@ -29,6 +32,7 @@ declare module 'vue' {
     VanList: typeof import('vant/es')['List']
     VanLoading: typeof import('vant/es')['Loading']
     VanNavBar: typeof import('vant/es')['NavBar']
+    VanPopup: typeof import('vant/es')['Popup']
     VanPullRefresh: typeof import('vant/es')['PullRefresh']
     VanSearch: typeof import('vant/es')['Search']
     VanShareSheet: typeof import('vant/es')['ShareSheet']

@@ -9,6 +9,9 @@ import { useCityStore } from '@/store/task';
 import { usePositionStore } from '@/store/task';
 import { useScreenStore } from '@/store/task';
 import { getTaskListApi } from '@/api/task';
+import CitySwitch from '@/components/CitySwitch.vue';
+import PositionType from '@/components/PositionType.vue';
+import Screen from '@/components/Screen.vue';
 const router = useRouter();
 const cityStore = useCityStore();
 const positionStore = usePositionStore();
@@ -19,6 +22,12 @@ const finished = ref(false);    // 是否已加载完所有数据
 const refreshing = ref(false);  // 下拉刷新状态
 const pageNum = ref(0);         // 当前页码
 const pageSize = 10;            // 每页条数
+
+// 弹窗变量
+const showCity = ref(false);
+const showPosition = ref(false);
+const showScreen = ref(false);
+
 const getTaskList = async () => {
     if(refreshing.value) {
       pageNum.value = 0;
@@ -75,20 +84,27 @@ watch(() => positionStore.positionValue, () => {
     refreshing.value = true;
     onRefresh();
 });
+
+// 监听筛选变化
+const onScreenConfirm = () => {
+    showScreen.value = false;
+    refreshing.value = true;
+    onRefresh();
+}
 onMounted(() => getTaskList())
 </script>
 
 <template>
   <div class="app-container">
     <div class="nav-header">
-        <div class="header-row-1" @click="() => router.push('/task/city/list')">
+        <div class="header-row-1" @click="showCity = true">
             <van-icon name="location" color="#FF9800" size="16px" />
             <span class="city-text">{{ cityStore.cityValue }}</span>
             <van-icon name="arrow-down" color="#333" size="10px" class="icon-arrow" />
         </div>
 
         <div class="header-row-2">
-            <div class="search-capsule">
+            <div class="search-capsule" @click="() => router.push('/task/search')">
                 <van-icon name="search" color="#A0A0A0" size="16px" class="icon-search" />
                 <input type="text" readonly placeholder="请输入想要搜索的内容" />
             </div>
@@ -107,11 +123,11 @@ onMounted(() => getTaskList())
         <div class="section-header">
             <h3 class="section-title">最新任务</h3>
             <div class="filter-controls">
-                <div class="filter-btn" @click="() => router.push('/task/position/type')">
+                <div class="filter-btn" @click="showPosition = true">
                     {{ positionStore.positionValue || '全部' }}
                     <van-icon name="arrow-down" color="#666" size="10px" style="margin-left: 3px;" />
                 </div>
-                <div class="filter-btn" @click="() => router.push('/task/screen')">
+                <div class="filter-btn" @click="showScreen = true">
                     筛选
                     <van-icon name="filter-o" color="#666" size="12px" style="margin-left: 3px;" />
                 </div>
@@ -134,6 +150,31 @@ onMounted(() => getTaskList())
     </div>
 
     <FooterTabbar />
+
+    <van-popup 
+        v-model:show="showCity" 
+        position="right" 
+        :style="{ width: '100%', height: '100%' }"
+    >
+        <!-- 父组件通过事件关闭弹窗 -->
+        <CitySwitch @close="showCity = false" />
+    </van-popup>
+
+    <van-popup 
+        v-model:show="showPosition" 
+        position="right" 
+        :style="{ width: '100%', height: '100%' }"
+    >
+        <PositionType @close="showPosition = false" />
+    </van-popup>
+
+    <van-popup 
+        v-model:show="showScreen" 
+        position="right" 
+        :style="{ width: '85%', height: '100%' }"
+    >
+        <Screen @close="showScreen = false" @confirm="onScreenConfirm" />
+    </van-popup>
   </div>
 </template>
 
