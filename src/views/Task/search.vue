@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Dialog } from 'vant';
 import { useSearchStore } from '@/store/task';
+import { getHotSearchApi } from '@/api/task';
 const router = useRouter();
 const searchText = ref('');
 const searchStore = useSearchStore();
@@ -10,11 +11,14 @@ const handleSearch = (keywords: string) => {
     if(!keywords.trim()) return;
     searchText.value = keywords;
     searchStore.addHistory(keywords);
+    router.replace({ path: '/task/searchResult', query: { keyword: keywords } });
 }
 
-const hotList = ref([
-  'Java', 'UI设计师', '销售经理', '行政助理', 'Python', '人力资源', '会计'
-]);
+const hotList = ref<any[]>([]);
+const getHotSearch = async () => {
+    const res = await getHotSearchApi();
+    hotList.value = res;
+}
 const clearHistory = () => {
     Dialog.confirm({
         title: '提示',
@@ -27,6 +31,9 @@ const clearHistory = () => {
       // 取消操作
     });
 }
+onMounted(() => {
+    getHotSearch();
+});
 </script>
 <template>
   <div class="search-page">
@@ -80,10 +87,10 @@ const clearHistory = () => {
             :key="index" 
             class="tag hot-tag"
             :class="{ 'top-three': index < 3 }"
-            @click="handleSearch(item)"
+            @click="handleSearch(item.title)"
           >
             <van-icon v-if="index < 3" name="fire" class="rank-icon" />
-            {{ item }}
+            {{ item.title }}
           </span>
         </div>
       </div>

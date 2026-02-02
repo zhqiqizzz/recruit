@@ -21,6 +21,7 @@ declare module 'vue' {
     Screen: typeof import('./src/components/Screen.vue')['default']
     TalentList: typeof import('./src/components/list/TalentList.vue')['default']
     TaskList: typeof import('./src/components/list/TaskList.vue')['default']
+    VanActionSheet: typeof import('vant/es')['ActionSheet']
     VanBadge: typeof import('vant/es')['Badge']
     VanButton: typeof import('vant/es')['Button']
     VanCell: typeof import('vant/es')['Cell']

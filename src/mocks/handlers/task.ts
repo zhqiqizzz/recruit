@@ -2,6 +2,15 @@ import { delay, http } from "msw";
 import { db } from "@/mocks/db";
 import { success, error } from "@/mocks/utils";
 
+const hotSearchList = [
+  { id: 339, title: "前端开发", count_title: 100 },
+  { id: 331, title: "运营", count_title: 90 },
+  { id: 522, title: "销售", count_title: 65 },
+  { id: 530, title: "测试", count_title: 46 },
+  { id: 503, title: "UI设计师", count_title: 70 },
+  { id: 521, title: "Java", count_title: 80 },
+  { id: 1358, title: "产品经理", count_title: 4 },
+];
 export const taskHandlers = [
   http.get("/api/banner/list", ({ request }) => {
     const url = new URL(request.url);
@@ -24,6 +33,13 @@ export const taskHandlers = [
     });
   }),
 
+  http.get("/api/task/hotSearch", async () => {
+    await delay(200);
+    // 按热度降序排列
+    const sortedList = [...hotSearchList].sort((a, b) => b.count_title - a.count_title);
+    return success(sortedList);
+  }), 
+
   http.get("/api/task/taskList", async ({ request }) => {
     await delay(500);
 
@@ -31,6 +47,7 @@ export const taskHandlers = [
     const url = new URL(request.url);
     const pageNum = Number(url.searchParams.get("pageNum") || 1);
     const pageSize = Number(url.searchParams.get("pageSize") || 10);
+    const sortType = Number(url.searchParams.get("sortType") || 0);
     const city = url.searchParams.get("city");
     const positionName = url.searchParams.get("position_name");
     const serviceMode = url.searchParams.get("service_mode");
@@ -45,11 +62,20 @@ export const taskHandlers = [
         return item.city && item.city === city;
       });
     }
-    // 职位类型筛选
+
     if (positionName && positionName !== "全部") {
-      filteredList = filteredList.filter((item: any) =>
-        item.position_name?.includes(positionName)
-      );
+      const keyword = positionName.toLowerCase().trim();
+      
+      filteredList = filteredList.filter((item: any) => {
+        const pName = item.position_name?.toLowerCase() || "";
+        const cName = item.company_name?.toLowerCase() || "";
+        return pName.includes(keyword) || cName.includes(keyword);
+      });
+      // 更新热搜数据
+      const hotItem = hotSearchList.find(h => h.title.toLowerCase() === keyword);
+      if (hotItem) {
+        hotItem.count_title++;
+      }
     }
     // 服务方式筛选
     if (serviceMode) {
@@ -59,7 +85,6 @@ export const taskHandlers = [
     }
     // 任务周期筛选
     if (taskCycle) {
-      // 简单匹配，实际可能需要区间判断
       filteredList = filteredList.filter(
         (item: any) => String(item.task_cycle) === taskCycle
       );
@@ -75,6 +100,18 @@ export const taskHandlers = [
         );
       }
     }
+
+    if (sortType === 1) {
+      filteredList.sort((a: any, b: any) => b.task_id - a.task_id);
+    } else if (sortType === 2) {
+      filteredList.sort((a: any, b: any) => b.salary - a.salary);
+    } else if (sortType === 3) {
+      filteredList.sort((a: any, b: any) => {
+      const timeA = a.updateTime ? new Date(a.updateTime).getTime() : 0;
+      const timeB = b.updateTime ? new Date(b.updateTime).getTime() : 0;
+      return timeB - timeA;
+    });
+}
 
     // 处理分页逻辑
     const total = filteredList.length;

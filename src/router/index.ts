@@ -35,6 +35,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/views/Task/companySource.vue"),
   },
   {
+    path: "/task/searchResult",
+    component: () => import("@/views/Task/searchResult.vue"),
+    meta: { title: '搜索结果' }
+  },
+  {
     path: "/contract",
     component: () => import("@/views/Contract/index.vue"),
   },

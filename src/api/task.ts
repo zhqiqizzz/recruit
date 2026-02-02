@@ -61,3 +61,9 @@ export function getCompanySourceApi(userId: any) {
     method: "get",
   }) as Promise<any>;
 }
+
+export function getHotSearchApi() {
+  return request({
+    url: "/task/hotSearch",
+  }) as Promise<any>;
+}
