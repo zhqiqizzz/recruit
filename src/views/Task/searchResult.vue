@@ -1,105 +1,53 @@
 <script setup lang="ts">
 import { ref,onMounted, watch, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { getTaskListApi } from '@/api/task';
-import type { taskItem } from '@/types/task';
 import TaskList from '@/components/list/TaskList.vue';
-import CitySwitch from '@/components/CitySwitch.vue';
-import PositionType from '@/components/PositionType.vue';
-import Screen from '@/components/Screen.vue';
 import { useCityStore } from '@/store/task';
 import { usePositionStore } from '@/store/task';
 import { useScreenStore } from '@/store/task';
+import TaskPopup from '@/views/Task/Components/TaskPopup.vue';
+import { useTaskList } from '@/composables/useTaskList';
+
 const route = useRoute();
 const router = useRouter();
 const keyword = ref(route.query.keyword || '');
+
 const cityStore = useCityStore();
 const positionStore = usePositionStore();
 const screenStore = useScreenStore();
-const taskList = ref<taskItem[]>([]);
-const loading = ref(false); // 上拉加载
-const finished = ref(false);
-const refreshing = ref(false); // 下拉刷新
-const pageNum = ref(0);
-const pageSize = 10;
 
+const sortType = ref(0);
 const sortOptions = ref([
     { text: '默认排序', value: 0 },
     { text: '薪资排序', value: 1 },
     { text: '时间排序', value: 2 },
 ]);
-const sortType = ref(0); // 默认排序
 
 // 弹窗变量
 const showCity = ref(false);
 const showPosition = ref(false);
 const showScreen = ref(false);
-const getTaskList = async () => {
-    if(refreshing.value){
-        pageNum.value = 0
-    } else {
-        pageNum.value++
-    }
-    try {
-        const res = await getTaskListApi({
-            city: cityStore.cityValue,
-            position_name: keyword.value || positionStore.positionValue,
-            service_mode: screenStore.serviceMode,
-            task_cycle: screenStore.taskCycle,
-            salary: screenStore.salary,
-            sortType: sortType.value,
-            pageNum: pageNum.value,
-            pageSize: pageSize
-        })
-        if(refreshing.value){
-            taskList.value = res.records
-            refreshing.value = false;
-        } else {
-            taskList.value = [...taskList.value, ...res.records]
-        }
-        loading.value = false;
-        if(taskList.value.length >= res.count){
-            finished.value = true;
-        }
-    } catch (error) {
-        loading.value = false;
-        refreshing.value = false;
-        finished.value = true;
-    }
-}
 
-const onLoad = () => {
-    getTaskList();
-}
-
-const onRefresh = () => {
-  finished.value = false;
-  loading.value = true;
-  onLoad();
-};
-
-watch(() => cityStore.cityValue, () => {
-    // 模拟一次“下拉刷新”动作
-    refreshing.value = true; 
-    onRefresh(); 
-});
+const { taskList, loading, finished, refreshing, onLoad, onRefresh, onResearch } = useTaskList(
+    // 参数获取函数
+    () => ({
+        position_name: keyword.value || positionStore.positionValue,
+        city: cityStore.cityValue,
+        service_mode: screenStore.serviceMode,
+        task_cycle: screenStore.taskCycle,
+        salary: screenStore.salary,
+        sortType: sortType.value
+    }),
+    [
+        () => cityStore.cityValue, 
+        () => sortType.value
+    ]
+)
 
 watch(() => positionStore.positionValue, () => {
     keyword.value = '' ;
-    refreshing.value = true;
-    onRefresh();
+    onResearch();
 });
-
-watch(sortType, () => {
-    refreshing.value = true;
-    onRefresh();
-});
-
-const onScreenConfirm = () => {
-    showScreen.value = false;
-    refreshing.value = true;
-    onRefresh();
-}
 
 const onClickLeft = () => router.back()
 const onSearchClick = () => router.replace('/task/search')
@@ -110,7 +58,7 @@ onMounted(() => {
         screenStore.setServiceMode('')
         screenStore.setTaskCycle('')
     }
-    getTaskList()
+    onLoad()
 })
 onBeforeUnmount(() => {
     positionStore.setPositionType('全部')
@@ -155,10 +103,12 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="content-body">
-      <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+      <van-pull-refresh v-model="refreshing" @refresh="onRefresh" success-text="刷新成功">
         <van-list
           v-model:loading="loading"
           :finished="finished"
+          success-text="刷新成功"
+          :finished-text="taskList.length > 0 ? '没有更多了' : ''"
           @load="onLoad"
         >
           <TaskList :taskList="taskList" />
@@ -169,17 +119,15 @@ onBeforeUnmount(() => {
       </van-pull-refresh>
     </div>
 
-    <van-popup v-model:show="showCity" position="right" :style="{ width: '100%', height: '100%' }">
-        <CitySwitch @close="showCity = false" />
-    </van-popup>
-
-    <van-popup v-model:show="showPosition" position="right" :style="{ width: '100%', height: '100%' }">
-        <PositionType @close="showPosition = false" />
-    </van-popup>
-
-    <van-popup v-model:show="showScreen" position="right" :style="{ width: '80%', height: '100%' }">
-        <Screen @close="showScreen = false" @confirm="onScreenConfirm" />
-    </van-popup>
+    <!-- v-model:propName 就是 :propName 和 @update:propName -->
+    <!-- :propName 给子组件传递一个名为 propName 的 props -->
+    <!-- @update:propName 监听子组件一个名为 update:propName 的自定义事件 -->
+    <TaskPopup 
+      v-model:showCity="showCity"
+      v-model:showPosition="showPosition"
+      v-model:showScreen="showScreen"
+      @finish="onResearch"
+    />
   </div>
 </template>
 

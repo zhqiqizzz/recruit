@@ -1,97 +1,38 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref } from 'vue';
 import FooterTabbar from '@/components/FooterTabbar.vue';
 import TaskList from '@/components/list/TaskList.vue';
-import type { taskItem } from '@/types/task';
 import Banner from '@/views/Task/Components/Banner.vue';
 import { useRouter } from 'vue-router';
 import { useCityStore } from '@/store/task';
 import { usePositionStore } from '@/store/task';
 import { useScreenStore } from '@/store/task';
-import { getTaskListApi } from '@/api/task';
-import CitySwitch from '@/components/CitySwitch.vue';
-import PositionType from '@/components/PositionType.vue';
-import Screen from '@/components/Screen.vue';
+import { useTaskList } from '@/composables/useTaskList';
+import TaskPopup from '@/views/Task/Components/TaskPopup.vue';
 const router = useRouter();
 const cityStore = useCityStore();
 const positionStore = usePositionStore();
 const screenStore = useScreenStore();
-const taskList = ref<taskItem[]>([]);
-const loading = ref(false);     // 上拉加载状态
-const finished = ref(false);    // 是否已加载完所有数据
-const refreshing = ref(false);  // 下拉刷新状态
-const pageNum = ref(0);         // 当前页码
-const pageSize = 10;            // 每页条数
 
 // 弹窗变量
 const showCity = ref(false);
 const showPosition = ref(false);
 const showScreen = ref(false);
 
-const getTaskList = async () => {
-    if(refreshing.value) {
-      pageNum.value = 0;
-    } else {
-      pageNum.value++
-    }
-    try{
-      const res = await getTaskListApi({
-        city: cityStore.cityValue,
+const { taskList, loading, finished, refreshing, onLoad, onRefresh, onResearch } = useTaskList(
+    // 参数获取函数
+    () => ({
         position_name: positionStore.positionValue,
+        city: cityStore.cityValue,
         service_mode: screenStore.serviceMode,
         task_cycle: screenStore.taskCycle,
         salary: screenStore.salary,
-        pageNum: pageNum.value,
-        pageSize: pageSize
-      })
-      // 判断是下拉刷新还是上拉加载
-      if(refreshing.value){
-        taskList.value = res.records;
-        refreshing.value = false;
-      } else {
-        taskList.value = [...taskList.value, ...res.records];
-      }
-      // 设置加载状态
-      loading.value = false;
-      if(taskList.value.length >= res.count){
-        finished.value = true;
-      }
-
-    } catch (error) {
-      loading.value = false;
-      finished.value = true;
-      refreshing.value = false;
-    }
-}
-
-// 触发底部加载
-const onLoad = () => {
-    getTaskList();
-}
-const onRefresh = () => {
-    loading.value = true;
-    finished.value = false;
-    onLoad();
-}
-watch(() => cityStore.cityValue, () => {
-    // 模拟一次“下拉刷新”动作
-    refreshing.value = true; 
-    onRefresh(); 
-});
-
-// 监听职位变化
-watch(() => positionStore.positionValue, () => {
-    refreshing.value = true;
-    onRefresh();
-});
-
-// 监听筛选变化
-const onScreenConfirm = () => {
-    showScreen.value = false;
-    refreshing.value = true;
-    onRefresh();
-}
-onMounted(() => getTaskList())
+    }),
+    [
+        () => cityStore.cityValue, 
+        () => positionStore.positionValue, 
+    ]
+)
 </script>
 
 <template>
@@ -134,11 +75,11 @@ onMounted(() => getTaskList())
             </div>
         </div>
 
-        <van-pull-refresh v-model="refreshing" @refresh="onRefresh" class="list-wrapper">
+        <van-pull-refresh v-model="refreshing" @refresh="onRefresh" class="list-wrapper" success-text="刷新成功">
           <van-list
             v-model:loading="loading"
             :finished="finished"
-            finished-text="没有更多了"
+            :finished-text="taskList.length > 0 ? '没有更多了' : ''"
             @load="onLoad"
           >
             <TaskList :taskList="taskList" />
@@ -148,33 +89,13 @@ onMounted(() => getTaskList())
           </van-list>
         </van-pull-refresh>
     </div>
-
     <FooterTabbar />
-
-    <van-popup 
-        v-model:show="showCity" 
-        position="right" 
-        :style="{ width: '100%', height: '100%' }"
-    >
-        <!-- 父组件通过事件关闭弹窗 -->
-        <CitySwitch @close="showCity = false" />
-    </van-popup>
-
-    <van-popup 
-        v-model:show="showPosition" 
-        position="right" 
-        :style="{ width: '100%', height: '100%' }"
-    >
-        <PositionType @close="showPosition = false" />
-    </van-popup>
-
-    <van-popup 
-        v-model:show="showScreen" 
-        position="right" 
-        :style="{ width: '85%', height: '100%' }"
-    >
-        <Screen @close="showScreen = false" @confirm="onScreenConfirm" />
-    </van-popup>
+    <TaskPopup 
+      v-model:showCity="showCity"
+      v-model:showPosition="showPosition"
+      v-model:showScreen="showScreen"
+      @finish="onResearch"
+    />
   </div>
 </template>
 
