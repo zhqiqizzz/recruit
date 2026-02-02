@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref,onMounted, watch } from 'vue';
+import { ref,onMounted, watch, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getTaskListApi } from '@/api/task';
 import type { taskItem } from '@/types/task';
@@ -12,7 +12,7 @@ import { usePositionStore } from '@/store/task';
 import { useScreenStore } from '@/store/task';
 const route = useRoute();
 const router = useRouter();
-const keyword = route.query.keyword || '';
+const keyword = ref(route.query.keyword || '');
 const cityStore = useCityStore();
 const positionStore = usePositionStore();
 const screenStore = useScreenStore();
@@ -24,9 +24,9 @@ const pageNum = ref(0);
 const pageSize = 10;
 
 const sortOptions = ref([
-    { name: '默认排序', value: 0 },
-    { name: '薪资排序', value: 1 },
-    { name: '时间排序', value: 2 },
+    { text: '默认排序', value: 0 },
+    { text: '薪资排序', value: 1 },
+    { text: '时间排序', value: 2 },
 ]);
 const sortType = ref(0); // 默认排序
 
@@ -34,7 +34,6 @@ const sortType = ref(0); // 默认排序
 const showCity = ref(false);
 const showPosition = ref(false);
 const showScreen = ref(false);
-const showSort = ref(false);
 const getTaskList = async () => {
     if(refreshing.value){
         pageNum.value = 0
@@ -44,10 +43,11 @@ const getTaskList = async () => {
     try {
         const res = await getTaskListApi({
             city: cityStore.cityValue,
-            position_name: positionStore.positionValue,
+            position_name: keyword.value || positionStore.positionValue,
             service_mode: screenStore.serviceMode,
             task_cycle: screenStore.taskCycle,
             salary: screenStore.salary,
+            sortType: sortType.value,
             pageNum: pageNum.value,
             pageSize: pageSize
         })
@@ -84,6 +84,17 @@ watch(() => cityStore.cityValue, () => {
     onRefresh(); 
 });
 
+watch(() => positionStore.positionValue, () => {
+    keyword.value = '' ;
+    refreshing.value = true;
+    onRefresh();
+});
+
+watch(sortType, () => {
+    refreshing.value = true;
+    onRefresh();
+});
+
 const onScreenConfirm = () => {
     showScreen.value = false;
     refreshing.value = true;
@@ -92,14 +103,21 @@ const onScreenConfirm = () => {
 
 const onClickLeft = () => router.back()
 const onSearchClick = () => router.replace('/task/search')
-
-const onSortSelect = (action: any) => {
-    sortType.value = action.value;
-    showSort.value = false;
-    refreshing.value = true;
-    onRefresh();
-}
-onMounted(() => getTaskList())
+onMounted(() => {
+    if(keyword.value){
+        positionStore.setPositionType('全部')
+        screenStore.setSalary('')
+        screenStore.setServiceMode('')
+        screenStore.setTaskCycle('')
+    }
+    getTaskList()
+})
+onBeforeUnmount(() => {
+    positionStore.setPositionType('全部')
+    screenStore.setSalary('')
+    screenStore.setServiceMode('')
+    screenStore.setTaskCycle('')
+})
 </script>
 
 <template>
@@ -128,9 +146,10 @@ onMounted(() => getTaskList())
                 <span class="text">筛选</span>
                 <van-icon name="filter-o" color="#666" size="12px" />
             </div>
-            <div class="filter-item" @click="showSort = true">
-                <span class="text">{{ sortOptions[sortType]?.name }}</span>
-                <van-icon name="arrow-down" color="#666" size="10px" />
+            <div class="filter-item dropdown-wrapper">
+                <van-dropdown-menu active-color="#FE8F27">
+                    <van-dropdown-item v-model="sortType" :options="sortOptions" />
+                </van-dropdown-menu>
             </div>
         </div>
     </div>
@@ -140,7 +159,6 @@ onMounted(() => getTaskList())
         <van-list
           v-model:loading="loading"
           :finished="finished"
-          finished-text="没有更多了"
           @load="onLoad"
         >
           <TaskList :taskList="taskList" />
@@ -162,14 +180,6 @@ onMounted(() => getTaskList())
     <van-popup v-model:show="showScreen" position="right" :style="{ width: '80%', height: '100%' }">
         <Screen @close="showScreen = false" @confirm="onScreenConfirm" />
     </van-popup>
-
-    <van-action-sheet
-      v-model:show="showSort"
-      :actions="sortOptions"
-      @select="onSortSelect"
-      description="请选择排序方式"
-      close-on-click-action
-    />
   </div>
 </template>
 
@@ -231,6 +241,7 @@ onMounted(() => getTaskList())
     font-size: 13px;
     color: #666;
     height: 100%;
+    min-width: 0;
 }
 .filter-item:active {
     background-color: #f9f9f9;
@@ -242,10 +253,39 @@ onMounted(() => getTaskList())
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-
+.dropdown-wrapper {
+    flex: 1; 
+}
 .content-body {
   flex: 1;
   padding: 0 16px;
   margin-top: 10px;
+}
+
+:deep(.van-dropdown-menu) {
+    height: 40px;
+    background: transparent;
+}
+:deep(.van-dropdown-menu__bar) {
+    height: 40px;
+    box-shadow: none;
+    background: transparent;
+}
+:deep(.van-dropdown-menu__item) {
+    justify-content: center;
+}
+:deep(.van-dropdown-menu__title) {
+    font-size: 13px;
+    color: #666;
+    padding: 0 8px;
+}
+:deep(.van-dropdown-menu__title--active) {
+    color: #FE8F27;
+}
+:deep(.van-dropdown-item__option--active) {
+    color: #FE8F27;
+}
+:deep(.van-dropdown-item__icon) {
+    color: #FE8F27;
 }
 </style>

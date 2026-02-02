@@ -101,11 +101,11 @@ export const taskHandlers = [
       }
     }
 
-    if (sortType === 1) {
+    if (sortType === 0) {
       filteredList.sort((a: any, b: any) => b.task_id - a.task_id);
-    } else if (sortType === 2) {
+    } else if (sortType === 1) {
       filteredList.sort((a: any, b: any) => b.salary - a.salary);
-    } else if (sortType === 3) {
+    } else if (sortType === 2) {
       filteredList.sort((a: any, b: any) => {
       const timeA = a.updateTime ? new Date(a.updateTime).getTime() : 0;
       const timeB = b.updateTime ? new Date(b.updateTime).getTime() : 0;
