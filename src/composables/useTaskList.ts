@@ -1,8 +1,7 @@
 import { ref, watch, type WatchSource } from 'vue';
-import type { taskItem } from '@/types/task';
 import { getTaskListApi } from '@/api/task';
 export function useTaskList(getParams: () => any, watchSources: WatchSource[] = []) {
-    const taskList = ref<taskItem[]>([])
+    const taskList = ref<any[]>([])
     const pageNum = ref(0)
     const pageSize = ref(10)
 

@@ -8,19 +8,20 @@ import "vant/lib/index.css";
 import "vant/es/toast/style";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 
-async function enableMocking() {
-  if (process.env.NODE_ENV !== "development") {
-    return;
-  }
-  const { worker } = await import("@/mocks/browser");
-  return worker.start({
-    onUnhandledRequest: "bypass",
-  });
-}
+// async function enableMocking() {
+//   if (process.env.NODE_ENV !== "development") {
+//     return;
+//   }
+//   const { worker } = await import("@/mocks/browser");
+//   return worker.start({
+//     onUnhandledRequest: "bypass",
+//   });
+// }
 pinia.use(piniaPluginPersistedstate);
 const app = createApp(App);
-enableMocking().then(() => {
-  app.use(pinia);
-  app.use(router);
-  app.mount("#app");
-});
+app.use(pinia);
+app.use(router);
+app.mount("#app");
+// enableMocking().then(() => {
+  
+// });

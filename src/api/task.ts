@@ -1,69 +1,78 @@
 import request from "@/utils/request";
-import type { taskListRes, taskItem } from "@/types/task";
-interface bannerListRes {
-  list: Array<any>;
-}
-export interface ScreenDictItem {
-  label: string;
-  value: string;
-}
+// import type { taskListRes, taskItem } from "@/types/task";
+// interface bannerListRes {
+//   list: Array<any>;
+// }
+// export interface ScreenDictItem {
+//   label: string;
+//   value: string;
+// }
 
-export interface ScreenData {
-  serviceMode: ScreenDictItem[];
-  taskCycle: ScreenDictItem[];
-  salary: ScreenDictItem[];
-}
+// export interface ScreenData {
+//   serviceMode: ScreenDictItem[];
+//   taskCycle: ScreenDictItem[];
+//   salary: ScreenDictItem[];
+// }
 
+// 任务列表接口
 export function getTaskListApi(data: any) {
   return request({
-    url: "/task/taskList",
+    url: "/task/taskAllList",
     method: "get",
     params: data,
-  }) as Promise<taskListRes>;
+  }) as Promise<any>;
 }
 
+// banner列表接口
 export function getBannerListApi(type: any) {
   return request({
     url: "/banner/list",
     params: type,
-  }) as Promise<bannerListRes>;
+  }) as Promise<any>;
 }
 
+// 城市列表接口
 export function getCityListApi() {
   return request({
     url: "/sys/city/list",
   });
 }
 
+// 职位类型列表接口
 export function getPositionTypeApi() {
   return request({
-    url: "/position/type",
+    url: "/position/positionTypeApi",
   });
 }
 
+// 筛选列表接口
 export function getTaskScreenApi() {
   return request({
-    url: "/task/screen",
-  }) as Promise<ScreenData>;
+    url: "/task/getTaskAll",
+  }) as Promise<any>;
 }
 
+// 任务详情接口
 export function getTaskDetailApi(taskId: any) {
   return request({
-    url: `/task/detail/${taskId}`,
-    method: "get",
-  }) as Promise<taskItem>;
-}
-
-// 传入发布者id
-export function getCompanySourceApi(userId: any) {
-  return request({
-    url: `/task/companySource/${userId}`,
+    url: `/task/getTaskDetails/${taskId}`,
     method: "get",
   }) as Promise<any>;
 }
 
-export function getHotSearchApi() {
+// 热门搜索接口
+export function getHotSearchApi(type: any) {
   return request({
-    url: "/task/hotSearch",
+    url: "/position/public/getHotSearch",
+    params: type,
+  }) as Promise<any>;
+}
+
+// 收藏接口
+export function getCollectionApi(data: any) {
+  return request({
+    url: "/course/TaskCollection",
+    method: "post",
+    data,
   }) as Promise<any>;
 }

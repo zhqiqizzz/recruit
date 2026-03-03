@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { taskItem } from '@/types/task';
 import {useRouter} from 'vue-router'
 const props = withDefaults(defineProps<{
-    taskList: taskItem[]
+    taskList: any[],
 }>(), {
     taskList: () => [],
     showCompany: true

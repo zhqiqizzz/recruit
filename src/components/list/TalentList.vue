@@ -1,8 +1,7 @@
 <script setup lang="ts">
     import {useRouter} from 'vue-router'
-    import type { Talent } from '@/types/talent';
     const props = withDefaults(defineProps<{
-        talentList: Talent[]
+        talentList: any[]
     }>(),{
         talentList: () => []
     })

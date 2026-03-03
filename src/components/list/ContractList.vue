@@ -1,8 +1,7 @@
 <script setup lang="ts">
     import {useRouter} from 'vue-router'
-    import type { Contract } from '@/types/contract';
     const props = withDefaults(defineProps<{
-        contractList: Contract[]
+        contractList: any[]
     }>(),{
         contractList: () => []
     })

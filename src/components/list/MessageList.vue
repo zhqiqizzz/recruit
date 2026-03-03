@@ -1,8 +1,7 @@
 <script setup lang="ts">
     import {useRouter} from 'vue-router'
-    import type { Message } from '@/types/message';
     const props = withDefaults(defineProps<{
-        messageList: Message[]
+        messageList: any[]
     }>(),{
         messageList: () => []
     })

@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { getTaskScreenApi, type ScreenDictItem } from '@/api/task';
 import { useScreenStore } from '@/store/task';
+import { getTaskScreenApi } from '@/api/task';
 const screenStore = useScreenStore();
-const serviceModeList = ref<ScreenDictItem[]>([]);
-const taskCycleList = ref<ScreenDictItem[]>([]);
-const salaryList = ref<ScreenDictItem[]>([]);
+const serviceModeList = ref<any[]>([]);
+const taskCycleList = ref<any[]>([]);
+const salaryList = ref<any[]>([]);
 const modeValue = ref(screenStore.serviceMode);
 const cycleValue = ref(screenStore.taskCycle);
 const salaryValue = ref(screenStore.salary);

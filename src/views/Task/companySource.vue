@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { getCompanySourceApi } from '@/api/task';
-import type { taskItem } from '@/types/task';
+import { getTaskListApi } from '@/api/task';
 import { getUserDetailApi } from '@/api/user';
 const router = useRouter();
 const route = useRoute();
@@ -10,12 +9,12 @@ const loading = ref(true);
 const onClickLeft = () => {
     router.back();
 }
-const taskList = ref<taskItem[]>([]);
+const taskList = ref<any[]>([]);
 const companyInfo = ref<any>({})
 const getCompanySource = async () => {
     const companyUserId = route.params.id
     const userRes = await getUserDetailApi(companyUserId);
-    const taskRes = await getCompanySourceApi(companyUserId);
+    const taskRes = await getTaskListApi({ company_user_id: companyUserId });
     taskList.value = taskRes
     companyInfo.value = userRes
 }
