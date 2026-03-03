@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { useUserStore } from "@/store/user";
 const userStore = useUserStore();
 export const useCityStore = defineStore("city", () => {
-  const cityValue = ref("北京市");
+  const cityValue = ref("北京");
   const setCity = (name: string) => {
     cityValue.value = name;
   };

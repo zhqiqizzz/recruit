@@ -1,12 +1,4 @@
 import request from "@/utils/request";
-
-// interface CodeRes {
-//   code: string;
-// }
-
-// interface PolicyRes {
-//   content: string;
-// }
 // 获取验证码
 export function getCode(data: any) {
   return request({
@@ -32,12 +24,4 @@ export function getPolicy(data: any) {
     method: "get",
     params: data,
   }) as Promise<any>;
-}
-
-// TODO 不知道那个地方用到的接口
-export function getUserDetailApi(userId: any) {
-  return request({
-    url: `/user/detail/${userId}`,
-    method: "get",
-  });
 }

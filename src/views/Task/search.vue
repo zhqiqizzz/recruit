@@ -16,8 +16,8 @@ const handleSearch = (keywords: string) => {
 
 const hotList = ref<any[]>([]);
 const getHotSearch = async () => {
-    const res = await getHotSearchApi({type: 1});
-    hotList.value = res;
+    const res = await getHotSearchApi({ type: 1 });
+    hotList.value = res.data;
 }
 const clearHistory = () => {
     Dialog.confirm({

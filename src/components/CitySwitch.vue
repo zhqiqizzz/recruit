@@ -2,7 +2,7 @@
 import { onMounted, ref, computed } from 'vue';
 import { getCityListApi } from '@/api/task';
 import { useCityStore } from '@/store/task';
-
+import { pinyin } from 'pinyin-pro';
 const emit = defineEmits(['close']);
 
 const store = useCityStore();
@@ -16,22 +16,50 @@ const onIndexChange = (index: string | number) => {
 
 const getCityList = async () => {
     const res = await getCityListApi();
-    cityData.value = res; 
+    const list = Array.isArray(res) ? res : []
+
+    const map: any = { '热门': [] };
+    const hots = ['北京', '上海', '广州', '深圳', '杭州', '成都'];
+    
+    list.forEach((city: any) => {
+        if(!city.name) return
+        if(hots.includes(city.name)){
+            map['热门'].push(city)
+        }
+
+        let letter = '#'
+        try {
+            const py = pinyin(city.name, { pattern: 'first', type: 'array' })
+            if (py && py[0]) letter = py[0].toUpperCase()
+        } catch (e) {}
+
+        if(!map[letter]) map[letter] = [];
+        map[letter].push(city);
+    });
+
+    const sortedMap: any = {'热门': map['热门'] };
+    Object.keys(map).sort().forEach(key => {
+        if(key !== '热门' && key !== '#') {
+            sortedMap[key] = map[key]
+        }
+    });
+    if(map['#']) sortedMap['#'] = map['#']
+    cityData.value = sortedMap
 };
 
 // 4. 关闭弹窗
 const leftBack = () => {
-  emit('close');
+  emit('close')
 };
 
 // 5. 选择并关闭
 const chooseCity = (cityName: string) => {
-  store.setCity(cityName);
-  emit('close');
+  store.setCity(cityName)
+  emit('close')
 };
 
 onMounted(() => {
-  getCityList();
+  getCityList()
 });
 </script>
 
@@ -66,7 +94,7 @@ onMounted(() => {
         <div v-if="key === '热门'" class="hot-city-grid">
              <span 
                 v-for="city in list" 
-                :key="city.code" 
+                :key="city.id" 
                 class="city-tag"
                 @click="chooseCity(city.name)"
              >
@@ -77,7 +105,7 @@ onMounted(() => {
         <div v-else>
             <van-cell 
                 v-for="city in list" 
-                :key="city.code" 
+                :key="city.id" 
                 :title="city.name" 
                 clickable
                 class="city-cell"

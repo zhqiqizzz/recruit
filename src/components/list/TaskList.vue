@@ -4,7 +4,6 @@ const props = withDefaults(defineProps<{
     taskList: any[],
 }>(), {
     taskList: () => [],
-    showCompany: true
 });
 const router = useRouter()
 const gotoDetail = (id: any) =>{
@@ -15,10 +14,10 @@ const gotoDetail = (id: any) =>{
     <div class="job-card" v-for="(item, index) in props.taskList" :key="index" @click="gotoDetail(item.task_id)">
         <div class="card-head">
             <div class="head-left">
-                <h3 class="job-title">{{ item.position_name }}</h3>
+                <h3 class="job-title">{{ item.task_name }}</h3>
                 <span v-if="item.is_emergency === 1" class="tag-urgent">急</span>
             </div>
-            <span class="salary-text">¥{{ item.salary }} / 月</span>
+            <span class="salary-text">¥{{ item.task_budget }} / 月</span>
         </div>
 
         <div class="card-tags">

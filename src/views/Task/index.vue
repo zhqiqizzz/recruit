@@ -22,7 +22,7 @@ const showScreen = ref(false);
 const { taskList, loading, finished, refreshing, onLoad, onRefresh, onResearch } = useTaskList(
     // 参数获取函数
     () => ({
-        position_name: positionStore.positionValue,
+        position_name: positionStore.positionValue === '全部' ? '' : positionStore.positionValue,
         city: cityStore.cityValue,
         service_mode: screenStore.serviceMode,
         task_cycle: screenStore.taskCycle,

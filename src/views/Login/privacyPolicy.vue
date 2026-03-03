@@ -8,8 +8,8 @@ const onClickLeft = () => {
     history.back();
 }
 const getPolicyChange = async () => {
-    const res = await getPolicy({id: 2})
-    state.value.content = res.content
+    const res = await getPolicy({id: 17})
+    state.value.content = res.records[0]?.content
 }
 onMounted(() => getPolicyChange())
 </script>

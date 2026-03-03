@@ -16,7 +16,7 @@ const toggleCollect = () => {
 const getTaskDetail = async () => {
     const taskId = route.params.id;
     const res = await getTaskDetailApi(taskId);
-    detail.value = res;
+    detail.value = res.records[0];
 }
 const onClickLeft = () => {
   router.back();
@@ -76,7 +76,7 @@ onMounted(() => {
       <div class="header-section">
         <div class="title-row">
           <h1 class="task-title">{{ detail.task_name }}</h1>
-          <span class="salary">￥{{ detail.salary }} / 月</span>
+          <span class="salary">￥{{ detail.task_budget }} / 月</span>
         </div>
         <span class="position-name">{{ detail.position_name }}</span>
         <div class="tags-row">
@@ -93,7 +93,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="recruiter-card" @click="router.push(`/task/companySource/${detail.user_id}`)">
+      <div class="recruiter-card" @click="router.push(`/task/companySource/${detail.company_id}`)">
         <div class="avatar-box">
           <img :src="detail.head_img || detail.it_head" class="avatar" alt="头像" />
           <div class="verified-badge"><van-icon name="success" /></div>
@@ -116,7 +116,7 @@ onMounted(() => {
         <h3 class="section-title">职位描述</h3>
         
         <div class="skill-tags">
-            <span class="skill">{{ detail.task_grade }}</span>
+            <span class="skill">{{ detail.task_grade || '基础' }}</span>
         </div>
 
         <div class="rich-text">

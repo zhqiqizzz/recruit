@@ -1,19 +1,4 @@
 import request from "@/utils/request";
-// import type { taskListRes, taskItem } from "@/types/task";
-// interface bannerListRes {
-//   list: Array<any>;
-// }
-// export interface ScreenDictItem {
-//   label: string;
-//   value: string;
-// }
-
-// export interface ScreenData {
-//   serviceMode: ScreenDictItem[];
-//   taskCycle: ScreenDictItem[];
-//   salary: ScreenDictItem[];
-// }
-
 // 任务列表接口
 export function getTaskListApi(data: any) {
   return request({
@@ -55,15 +40,16 @@ export function getTaskScreenApi() {
 // 任务详情接口
 export function getTaskDetailApi(taskId: any) {
   return request({
-    url: `/task/getTaskDetails/${taskId}`,
+    url: '/task/getTaskDetails',
     method: "get",
+    params: {task_id: taskId},
   }) as Promise<any>;
 }
 
 // 热门搜索接口
 export function getHotSearchApi(type: any) {
   return request({
-    url: "/position/public/getHotSearch",
+    url: "/position/public/getHotSeach",
     params: type,
   }) as Promise<any>;
 }

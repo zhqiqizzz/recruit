@@ -4,7 +4,7 @@ import { onMounted, ref } from 'vue';
 const bannerList = ref<any>([])
 const getBannerList = async () => {
     const res = await getBannerListApi({type: 2})
-    bannerList.value = res.list
+    bannerList.value = res.records.slice(5, 7)
 }
 onMounted(() => getBannerList())
 </script>

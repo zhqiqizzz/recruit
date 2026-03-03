@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref,onMounted, watch, onBeforeUnmount } from 'vue';
+import { ref,onMounted, watch, computed, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import TaskList from '@/components/list/TaskList.vue';
 import { useCityStore } from '@/store/task';
@@ -20,8 +20,9 @@ const sortType = ref(0);
 const sortOptions = ref([
     { text: '默认排序', value: 0 },
     { text: '薪资排序', value: 1 },
-    { text: '时间排序', value: 2 },
+    { text: '周期排序', value: 2 },
 ]);
+
 
 // 弹窗变量
 const showCity = ref(false);
@@ -40,7 +41,6 @@ const { taskList, loading, finished, refreshing, onLoad, onRefresh, onResearch }
     }),
     [
         () => cityStore.cityValue, 
-        () => sortType.value
     ]
 )
 
@@ -48,6 +48,16 @@ watch(() => positionStore.positionValue, () => {
     keyword.value = '' ;
     onResearch();
 });
+
+const soeredTaskList = computed(() => {
+    const list = [...taskList.value]
+    if(sortType.value === 1){
+        list.sort((a, b) => b.task_budget - a.task_budget)
+    } else if(sortType.value === 2){
+        list.sort((a, b) => a.task_cycle - b.task_cycle)
+    }
+    return list;
+})
 
 const onClickLeft = () => router.back()
 const onSearchClick = () => router.replace('/task/search')
@@ -111,7 +121,7 @@ onBeforeUnmount(() => {
           :finished-text="taskList.length > 0 ? '没有更多了' : ''"
           @load="onLoad"
         >
-          <TaskList :taskList="taskList" />
+          <TaskList :taskList="soeredTaskList" />
           <div v-if="taskList.length === 0 && !loading" class="empty-state">
              <van-empty image="search" description="没有找到相关职位" />
           </div>

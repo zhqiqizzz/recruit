@@ -5,19 +5,16 @@ import { getTaskScreenApi } from '@/api/task';
 const screenStore = useScreenStore();
 const serviceModeList = ref<any[]>([]);
 const taskCycleList = ref<any[]>([]);
-const salaryList = ref<any[]>([]);
 const modeValue = ref(screenStore.serviceMode);
 const cycleValue = ref(screenStore.taskCycle);
-const salaryValue = ref(screenStore.salary);
 const emit = defineEmits(['close', 'confirm']);
 const onClickLeft = () => {
     emit('close');
 }
 const getScreenData = async () => {
     const res = await getTaskScreenApi();
-    serviceModeList.value = res.serviceMode;
-    taskCycleList.value = res.taskCycle;
-    salaryList.value = res.salary;
+    serviceModeList.value = res.data.serviceMode;
+    taskCycleList.value = res.data.taskCycle;
 }
 const handleModeClick = (value: string) => {
     if(modeValue.value === value){
@@ -34,22 +31,13 @@ const handleCycleClick = (value: string) => {
     }
 }
 
-const handleSalaryClick = (value: string) => {
-    if(salaryValue.value === value){
-        salaryValue.value = '';
-    } else {
-        salaryValue.value = value;
-    }
-}
 const handleClear = () => {
     modeValue.value = '';
     cycleValue.value = '';
-    salaryValue.value = '';
 }
 const handleConfirm = () => {
     screenStore.setServiceMode(modeValue.value);
     screenStore.setTaskCycle(cycleValue.value);
-    screenStore.setSalary(salaryValue.value);
     emit('confirm');
 }
 onMounted(() => {
@@ -77,10 +65,10 @@ onMounted(() => {
                         v-for="(item, index) in serviceModeList" 
                         :key="index"
                         class="tag-item"
-                        :class="{ active: modeValue === item.value }"
-                        @click="handleModeClick(item.value)"
+                        :class="{ active: modeValue === item }"
+                        @click="handleModeClick(item)"
                     >
-                        {{ item.label }}
+                        {{ item }}
                     </span>
                     <div v-if="serviceModeList.length === 0" class="loading-state">
                         <span class="loading-line"></span>
@@ -98,33 +86,12 @@ onMounted(() => {
                         v-for="(item, index) in taskCycleList" 
                         :key="index"
                         class="tag-item"
-                        :class="{ active: cycleValue === item.value }"
-                        @click="handleCycleClick(item.value)"
+                        :class="{ active: cycleValue === item }"
+                        @click="handleCycleClick(item)"
                     >
-                        {{ item.label }}
+                        {{ item }}
                     </span>
                     <div v-if="taskCycleList.length === 0" class="loading-state">
-                         <span class="loading-line"></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="screen-block">
-                <div class="block-header">
-                    <span class="title">基础薪资</span>
-                    <span class="subtitle">Salary Range</span>
-                </div>
-                <div class="block-list">
-                    <span 
-                        v-for="(item, index) in salaryList" 
-                        :key="index"
-                        class="tag-item" 
-                        :class="{ active: salaryValue === item.value }"
-                        @click="handleSalaryClick(item.value)"
-                    >
-                        {{ item.label }}
-                    </span>
-                    <div v-if="salaryList.length === 0" class="loading-state">
                          <span class="loading-line"></span>
                     </div>
                 </div>

@@ -2,7 +2,6 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getTaskListApi } from '@/api/task';
-import { getUserDetailApi } from '@/api/user';
 const router = useRouter();
 const route = useRoute();
 const loading = ref(true);
@@ -10,13 +9,14 @@ const onClickLeft = () => {
     router.back();
 }
 const taskList = ref<any[]>([]);
-const companyInfo = ref<any>({})
 const getCompanySource = async () => {
-    const companyUserId = route.params.id
-    const userRes = await getUserDetailApi(companyUserId);
-    const taskRes = await getTaskListApi({ company_user_id: companyUserId });
-    taskList.value = taskRes
-    companyInfo.value = userRes
+    const companyId = route.params.id
+    const res = await getTaskListApi({
+      company_id: companyId,
+    })
+    taskList.value = res.records.filter((item: any) => {
+      return item.company_id === Number(companyId)
+    })
 }
 onMounted(() => {
     getCompanySource();
@@ -42,16 +42,16 @@ onMounted(() => {
           <van-loading type="spinner" color="#fff" />
       </div>
       <div v-else class="info-content">
-        <img :src="companyInfo.logo" class="logo" />
+        <img :src="taskList[0]?.logo" class="logo" />
         <div class="text-area">
-          <h2 class="comp-name">{{ companyInfo.company_name }}</h2>
+          <h2 class="comp-name">{{ taskList[0]?.company_name }}</h2>
           <p class="comp-sub">
-            <van-icon name="manager" /> {{ companyInfo.user_name }}
+            <van-icon name="manager" /> {{ taskList[0]?.user_name }}
             <span class="divider">|</span>
             在招职位 {{ taskList.length }} 个
           </p>
         </div>
-        <div class="verify-tag" >{{ companyInfo.is_checked ? '已认证' : '未认证' }}</div>
+        <div class="verify-tag" >{{ taskList[0]?.is_check === 1 ? '已认证' : '未认证' }}</div>
       </div>
       <div class="bg-shape"></div>
     </div>
@@ -72,7 +72,7 @@ onMounted(() => {
         >
           <div class="item-top">
             <span class="item-name">{{ item.task_name }}</span>
-            <span class="item-salary">￥{{ item.salary }} / 月</span>
+            <span class="item-salary">￥{{ item.task_budget }} / 月</span>
           </div>
           <div class="item-mid">
             <span class="tag">{{ item.city }}{{ item.area ? `·${item.area}` : '' }}</span>
