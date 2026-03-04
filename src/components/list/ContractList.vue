@@ -1,57 +1,46 @@
 <script setup lang="ts">
-    import {useRouter} from 'vue-router'
-    const props = withDefaults(defineProps<{
-        contractList: any[]
-    }>(),{
-        contractList: () => []
-    })
-    const router = useRouter()
-    const gotoDetail = (id: number) =>{
-        router.push(`/contract/details/${id}`)
-    }
+import {useRouter} from 'vue-router'
+import ProgressBar from '@/views/Contract/Components/ProgressBar.vue';
+const props = withDefaults(defineProps<{
+    contractList: any[]
+}>(),{
+    contractList: () => []
+})
+const router = useRouter()
+const gotoDetail = (contract_id: number) =>{
+    router.push(`/contract/details/${contract_id}`)
+}
 </script>
 <template>
-    <dl v-for="(item,index) in props.contractList" :key="index" @click="gotoDetail(item.id)">
+    <dl v-for="(item,index) in props.contractList" :key="index" @click="gotoDetail(item.contract_id)">
         <dd>
-            <!-- <h3>{{item.contract_name}}</h3> -->
-             <h3>软件开发合约</h3>
-            <!-- <span>{{item.is_contract_type_text}}</span> -->
-            <span>正式合约</span>
+            <h3>{{item.contract_name}}</h3>
+            <span>{{item.is_contract_type_text}}</span>
             <van-icon name="arrow" />
         </dd>
         <dt>
             <label>公司名称</label>
-            <!-- <span>{{item.company_name}}</span> -->
-            <span>深圳市阿里巴巴网络技术有限公司</span>
+            <span>{{item.company_name}}</span>
         </dt>
         <dt>
             <label>合约类型</label>
-            <!-- <span>{{item.contract_type}}</span> -->
-            <span>正式合约</span>
+            <span>{{item.contract_type}}</span>
         </dt>
         <dt>
             <label>合约周期</label>
-            <!-- <span>{{item.start_cycle_time}}-{{item.end_cycle_time}}</span> -->
-            <span>2023-01-01 - 2023-12-31</span>
+            <span>{{item.start_cycle_time}}-{{item.end_cycle_time}}</span>
         </dt>
         <dt>
             <label>签约时间</label>
-            <!-- <span>{{item.signing_time}}</span> -->
-            <span>2023-01-01</span>
+            <span>{{item.signing_time || "-"}}</span>
         </dt>
         <dt>
             <label>合约进度</label>
             <span></span>
         </dt>
-        <dt class="contract-progress">
-            <i></i>
-            <i></i>
-            <i></i>
-            <i></i>
-        </dt>
-        <!-- <dt>
+        <dt>
             <ProgressBar :item="item"></ProgressBar>
-        </dt> -->
+        </dt>
     </dl>
 </template>
 <style scoped>
@@ -92,24 +81,5 @@ dl dt label{
 }
 dl dt span{
     text-align: right;
-}
-.contract-progress{
-    display: flex;
-    height: 0.53rem;
-    width: 100%;
-}
-.contract-progress i{
-    flex: 1;
-    background: #f3f3f3;
-    margin: 0 1px;
-}
-.contract-progress i.green{
-    background: #50D400;
-}
-.contract-progress i.orange{
-    background: #FE9215;
-}
-.contract-progress i.red{
-    background: #FF4800;
 }
 </style>
