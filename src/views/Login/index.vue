@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { getCode } from '@/api/user'
-import { Notify } from 'vant';
+import { Toast } from 'vant';
 import { useUserStore } from '@/store/user';
 import { useRouter } from 'vue-router';
 const userStore = useUserStore();
@@ -35,11 +35,11 @@ const getCodeChange = async () => {
 
 const toLogin = async () => {
     if(state.value.code === '' || state.value.accounts === ''){
-        Notify({ type: 'warning', message: '请输入手机号和验证码' });
+        Toast('请输入手机号和验证码');
         return
     }
     if(!state.value.isChecked){
-        Notify({ type: 'warning', message: '请阅读并同意服务协议和隐私政策' });
+        Toast('请阅读并同意服务协议和隐私政策');
         return
     }
     await userStore.loginUser({
@@ -47,14 +47,13 @@ const toLogin = async () => {
         code: state.value.code
     })
     if(localStorage.getItem("role") === '1'){
-      console.log('跳转任务页')
         router.push('/task')
     } else if(localStorage.getItem("role") === '2'){
         router.push('/admin/home')
     } else if(localStorage.getItem("role") === '3'){
         router.push('/talent')
     } else {
-        Notify({ type: 'warning', message: '用户角色异常，请联系管理员' });
+        Toast('用户角色异常，请联系管理员');
     }
 }
 </script>

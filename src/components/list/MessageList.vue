@@ -1,29 +1,31 @@
 <script setup lang="ts">
-    import {useRouter} from 'vue-router'
-    const props = withDefaults(defineProps<{
-        messageList: any[]
-    }>(),{
-        messageList: () => []
-    })
-    const router = useRouter()
-    const gotoDetail = (id: number) =>{
-        router.push(`/message/details/${id}`)
+import {useRouter} from 'vue-router'
+const props = withDefaults(defineProps<{
+    messageList: any[]
+    type: string
+}>(),{
+    messageList: () => []
+})
+const router = useRouter()
+const gotoDetail = (thingsId: string, receiveId: string) =>{
+    if(props.type === 'system'){
+        router.push('/message/systemList')
+    } else if(props.type === 'talk'){
+        router.push(`/message/talk/${thingsId}/${receiveId}`)
     }
+}
 </script>
 <template>
-    <dl v-for="(item,index) in messageList" :key="index" @click="gotoDetail(item.id)">
+    <dl v-for="(item,index) in messageList" :key="index" @click="gotoDetail(item.things_id, item.receive_id)">
         <dd>
-            <!-- <img v-if="item.receive_is_read" :src="item.receive_is_read">
+            <img v-if="item.receive_is_read" :src="item.receive_is_read">
             <img v-else src="@/assets/img/icon/icon-message.png">
-            <span v-if="item.is_show"></span> -->
-            <img src="@/assets/img/icon/icon-message.png"></img>
+            <span v-if="item.is_show"></span>
             <span></span>
         </dd>
         <dt>
-            <!-- <h3>{{item.things_type ===1?item.receive_id_name:item.title}}<span>{{item.create_time}}</span></h3>
-            <p>{{item.content}}</p> -->
-            <h3>系统消息<span>2024-06-01</span></h3>
-            <p>您的账户密码已成功修改，如非本人操作，请及时联系客服。</p>
+            <h3>{{item.things_type ===1?item.receive_id_name:item.title}}<span>{{item.create_time}}</span></h3>
+            <p>{{item.content}}</p>
         </dt>
     </dl>
 </template>

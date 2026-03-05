@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import FooterTabbar from '@/components/FooterTabbar.vue';
 import MessageList from '@/components/list/MessageList.vue';
-import type { Message } from '@/types/message';
-const messageList = ref<Message[]>([
-    {id: 1},
-    {id: 2},
-]);
+import { useMessageStore } from '@/store/message';
+import { onMounted } from 'vue';
+const messageStore = useMessageStore();
+onMounted(()=>{
+    messageStore.getSystemMessageList()
+    messageStore.getChatMessageList()
+})
 </script>
 
 <template>
-    <MessageList :messageList="messageList" />
+    <MessageList :messageList="messageStore.systemNewMessage" type = "system"/>
+    <MessageList :messageList="messageStore.chatMessageList" type = "talk"/>
     <FooterTabbar />
 </template>
 <style scoped>
