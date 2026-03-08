@@ -25,3 +25,21 @@ export const directives = (app: any) => {
         }
     })
 }
+
+export const common = {
+    sex: function(type: number) {
+        if(type === 1)  return '男'
+        else if(type === 2) return '女'
+        else return '未知'
+    },
+    strToDate: function(date: string) {
+        const [year, month, day] = date.split('-').map(Number) as [number, number, number]
+        return new Date(year, month - 1, day)
+    },
+    dateToStr: function(date: Date) {
+        const year = date.getFullYear()
+        const month = (date.getMonth() + 1).toString().padStart(2, '0')
+        const day = date.getDate().toString().padStart(2, '0')
+        return `${year}-${month}-${day}`
+    }
+}

@@ -20,7 +20,7 @@ export function getBannerListApi(type: any) {
 export function getCityListApi() {
   return request({
     url: "/sys/city/list",
-  });
+  }) as Promise<any>;
 }
 
 // 职位类型列表接口

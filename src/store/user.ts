@@ -26,10 +26,14 @@ export const useUserStore = defineStore(
       localStorage.removeItem("token");
       localStorage.removeItem("role");
     };
+    const logout = () => {
+      clearUserInfo();
+    }
     return {
       userInfo,
       loginUser,
       clearUserInfo,
+      logout,
     };
   },
   {
