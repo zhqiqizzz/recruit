@@ -60,7 +60,7 @@ export function withdrawalApi(data: any) {
         url: '/my/apply/transfer',
         method: 'post',
         data
-    })
+    }) as Promise<any>
 }
 // 获取我的简历详情接口
 export function resumeDetailApi(data: any) {
